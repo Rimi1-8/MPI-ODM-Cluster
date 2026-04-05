@@ -1,0 +1,24 @@
+{
+  "shared_root": "shared",
+  "dataset_dir": "shared/dataset/images",
+  "chunks_dir": "shared/chunks",
+  "results_dir": "shared/results",
+  "final_dir": "shared/final",
+  "nodeodm_port": 3000,
+  "nodes": [
+    { "rank": 0, "name": "worker0", "host": "localhost" },
+    { "rank": 1, "name": "linux_worker1", "host": "10.100.54.210" },
+    { "rank": 2, "name": "linux_worker2", "host": "10.100.54.32" },
+    { "rank": 3, "name": "linux_worker3", "host": "10.100.53.218" }
+  ],
+  "odm_options": {
+    "feature-type": "hahog",
+    "matcher-type": "bruteforce"
+  },
+  "translations": {
+    "0": [0.0, 0.0, 0.0],
+    "1": [30.0, 0.0, 0.0],
+    "2": [60.0, 0.0, 0.0],
+    "3": [90.0, 0.0, 0.0]
+  }
+}

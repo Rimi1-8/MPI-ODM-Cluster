@@ -1,0 +1,109 @@
+Murmu================================================================================
+          MPI-ODM: 3-SYSTEM DISTRIBUTED IMPLEMENTATION PLAN
+================================================================================
+
+This document outlines the exact, step-by-step logic to deploy the MPI 
+Distributed Photogrammetry workflow scaling dynamically across THREE distinct 
+physical machines.
+
+For clarity:
+- SYSTEM A: Your central "Master" PC (Runs the controller).
+- SYSTEM B: Your second "Worker" PC.
+- SYSTEM C: Your third "Worker" PC.
+
+--------------------------------------------------------------------------------
+STEP 1: FILE TRANSFER & REGISTRATION
+--------------------------------------------------------------------------------
+
+1. Exact File Registration:
+   Take the zip file located at: 
+   `c:\SEM2_project\DCS\mpi-odm-paper\MPI-ODM_Project_Implementation.zip`
+   
+   Copy this exact file onto an external drive or cloud host and extract it 
+   natively onto BOTH System B and System C.
+
+--------------------------------------------------------------------------------
+STEP 2: INSTALL CORE DEPENDENCIES ON WORKER SYSTEMS (B & C)
+--------------------------------------------------------------------------------
+System B and System C mathematically require the identical execution foundation 
+as System A. Do this identically on BOTH endpoints:
+
+1. Python 3.10+
+   - Download the Python installer. Check "Add Python to PATH" before installing.
+
+2. Microsoft MPI (MS-MPI) [If Windows]
+   - Download and run BOTH: `msmpisetup.exe` and `msmpisdk.msi`. 
+
+3. Docker Desktop 
+   - Download Docker Desktop for your target OS and ensure the engine initializes.
+
+4. Python Dependencies
+   - Inside the extracted folder on B and C, open a terminal and run:
+     `python -m venv venv`
+     `.\venv\Scripts\activate` (or `source venv/bin/activate` for Linux/Mac)
+     `pip install -r requirements.txt`
+
+--------------------------------------------------------------------------------
+STEP 3: INITIALIZE BACKEND ENGINES (On All 3 Systems)
+--------------------------------------------------------------------------------
+Because we are spreading calculations across a triad, all 3 machines must listen!
+
+1. On System A, System B, AND System C: open your terminal and fire the engine:
+   `docker run -d -p 3000:3000 opendronemap/nodeodm`
+
+--------------------------------------------------------------------------------
+STEP 4: NETWORK SECURITY & IP MAPPING
+--------------------------------------------------------------------------------
+
+1. Gather Local IPv4 Addresses:
+   - On System A: Fetch IP (e.g., `192.168.1.10`)
+   - On System B: Fetch IP (e.g., `192.168.1.11`)
+   - On System C: Fetch IP (e.g., `192.168.1.12`)
+
+2. Firewall Configuration:
+   - To guarantee the dataset payloads transfer smoothly, you must temporarily 
+     turn off your Windows Defender Firewalls for Private Networks or explicitly 
+     White-List Port `3000` via TCP connections across all 3 routers/machines.
+
+--------------------------------------------------------------------------------
+STEP 5: UPDATE ORCHESTRATION GRAPHS (On System A ONLY)
+--------------------------------------------------------------------------------
+You only edit the pipeline scripts on your control machine (System A).
+
+1. Edit the `hosts` Topology routing file:
+   Open `c:\SEM2_project\DCS\mpi-odm-paper\mpi-odm-paper\hosts`
+   Distribute your 4 calculation ranks asymmetrically across the 3 IP addresses:
+     192.168.1.10 slots=2
+     192.168.1.11 slots=1
+     192.168.1.12 slots=1
+
+2. Edit the Dynamic Architecture matrix (`cluster_config.json`):
+   Open `config\cluster_config.json` on System A. Map exactly where the NodeODM 
+   engines are listening across your triad so the script blasts packets accordingly:
+
+   "nodes": [
+       { "rank": 0, "name": "System_A_Master", "host": "192.168.1.10" },
+       { "rank": 1, "name": "System_A_Sub",    "host": "192.168.1.10" },
+       { "rank": 2, "name": "System_B_Worker", "host": "192.168.1.11" },
+       { "rank": 3, "name": "System_C_Worker", "host": "192.168.1.12" }
+   ]
+
+   *(Note: This logic assigns 2 massive image chunks to process purely on 
+   System A, and fires 1 chunk out to System B and 1 out to System C respectively).*
+
+--------------------------------------------------------------------------------
+STEP 6: FIRE THE 3-NODE CLUSTER PIPELINE
+--------------------------------------------------------------------------------
+With the triad perfectly configured, hit execute straight from System A:
+
+1. Target your master directory: `cd c:\SEM2_project\DCS\mpi-odm-paper\mpi-odm-paper`
+2. Activate safety environment: `.\venv\Scripts\activate`
+3. Execute the single string:
+   `powershell -ExecutionPolicy Bypass -File .\run_single_system.ps1`
+
+RESULTS:
+System A's Python environment rips the drone images apart mathematically, executes 
+the MS-MPI controller, and bridges parallel computations targeting all 3 PCs. 
+All 3 systems compute their specific structural matrices at the exact same time, and 
+then stream the massive output textures back over the network back into System A 
+where they permanently merge!

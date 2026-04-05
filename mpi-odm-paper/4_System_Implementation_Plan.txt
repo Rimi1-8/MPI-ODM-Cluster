@@ -1,0 +1,110 @@
+================================================================================
+          MPI-ODM: 4-SYSTEM DISTRIBUTED IMPLEMENTATION PLAN
+================================================================================
+
+This document outlines the exact, step-by-step logic to deploy the MPI 
+Distributed Photogrammetry workflow spanning out to a massive localized 
+Array encompassing Four Physical Machines.
+
+For clarity:
+- SYSTEM A: Central "Master" PC.
+- SYSTEM B: "Worker 1" PC.
+- SYSTEM C: "Worker 2" PC.
+- SYSTEM D: "Worker 3" PC.
+
+--------------------------------------------------------------------------------
+STEP 1: FILE CLONING & NETWORK DEPLOYMENT
+--------------------------------------------------------------------------------
+
+1. Exact File Registration:
+   Take your finalized zip payload located at: 
+   `c:\SEM2_project\DCS\mpi-odm-paper\MPI-ODM_Project_Implementation.zip`
+   
+   Securely extract it natively onto ALL FOUR separate System environments.
+
+--------------------------------------------------------------------------------
+STEP 2: INSTALL CORE DEPENDENCIES ON WORKER SYSTEMS (B, C, & D)
+--------------------------------------------------------------------------------
+Each processing node must be mathematically identical structurally. Ensure 
+you run the exact setup parameters uniformly on B, C, and D:
+
+1. Python 3.10+
+   - Download the Python installer. Check "Add Python to PATH" before installing.
+
+2. Microsoft MPI (MS-MPI) [If Windows target]
+   - Download and run BOTH: `msmpisetup.exe` and `msmpisdk.msi`. 
+
+3. Docker Desktop 
+   - Download Docker Desktop for your target OS and ensure the engine initializes.
+
+4. Python Dependencies
+   - Inside the deployed working directory on each worker, initialize isolation:
+     `python -m venv venv`
+     `.\venv\Scripts\activate` (or `source venv/bin/activate` for Linux/Mac)
+     `pip install -r requirements.txt`
+
+--------------------------------------------------------------------------------
+STEP 3: INITIALIZE BACKEND ENGINES (On All 4 Systems)
+--------------------------------------------------------------------------------
+To compute the dataset splits flawlessly across 4 processing endpoints, 
+each machine must have Docker actively listening to network API handshakes!
+
+1. On ALL FOUR PCs, open your native terminal and execute:
+   `docker run -d -p 3000:3000 opendronemap/nodeodm`
+
+--------------------------------------------------------------------------------
+STEP 4: NETWORK TOPOLOGY ROUTING 
+--------------------------------------------------------------------------------
+
+1. Gather Local IPv4 Addresses:
+   - System A IP (e.g., `192.168.1.10`)
+   - System B IP (e.g., `192.168.1.11`)
+   - System C IP (e.g., `192.168.1.12`)
+   - System D IP (e.g., `192.168.1.13`)
+
+2. Firewall Configuration:
+   - Disable standard internal firewall routing tracking temporarily 
+     (Private network configuration only) across B, C, and D, OR aggressively 
+     whitelist TCP Port 3000 mapping. 
+
+--------------------------------------------------------------------------------
+STEP 5: UPDATE THE 4-WAY GRAPH MAPS (On System A ONLY)
+--------------------------------------------------------------------------------
+With a true 4-worker array, mapping tasks is exceptionally symmetrical! 
+You only write these execution strings on System A.
+
+1. Edit the `hosts` sequence:
+   Open `c:\SEM2_project\DCS\mpi-odm-paper\mpi-odm-paper\hosts`
+   Distribute exactly ONE processing rank sequentially to each connected CPU:
+     192.168.1.10 slots=1
+     192.168.1.11 slots=1
+     192.168.1.12 slots=1
+     192.168.1.13 slots=1
+
+2. Bind the Target IPs internally (`cluster_config.json`):
+   Open `config\cluster_config.json` on System A. You map each discrete Rank 
+   variable perfectly 1-to-1 against each remote Docker NodeODM worker:
+
+   "nodes": [
+       { "rank": 0, "name": "SysA_Master", "host": "192.168.1.10" },
+       { "rank": 1, "name": "SysB_Sub",    "host": "192.168.1.11" },
+       { "rank": 2, "name": "SysC_Sub",    "host": "192.168.1.12" },
+       { "rank": 3, "name": "SysD_Sub",    "host": "192.168.1.13" }
+   ]
+
+--------------------------------------------------------------------------------
+STEP 6: EXECUTE THE MONSTER COMPUTATION ARRAY
+--------------------------------------------------------------------------------
+Execute the payload exactly exactly like before targeting the master shell scripts:
+
+1. Connect to System A explicitly: `cd c:\SEM2_project\DCS\mpi-odm-paper\mpi-odm-paper`
+2. Target environment: `.\venv\Scripts\activate`
+3. Execute the single string command:
+   `powershell -ExecutionPolicy Bypass -File .\run_single_system.ps1`
+
+RESULTS:
+System A triggers the mathematical splits exactly 4 ways simultaneously, firing 
+Rank 0 locally while simultaneously ripping the remaining 3 payloads out into 
+Systems B, C, and D synchronously over the router! This equates to TRUE parallel 
+processing metrics—all 4 nodes process photogrammetry calculations securely inside 
+Docker and output flawlessly downstream into a completely uniform master 3D Object.

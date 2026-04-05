@@ -1,0 +1,35 @@
+[
+  {
+    "rank": 0,
+    "host": "localhost",
+    "status": "connection_error",
+    "error": "HTTPConnectionPool(host='localhost', port=3000): Max retries exceeded with url: /info (Caused by NewConnectionError(\"HTTPConnection(host='localhost', port=3000): Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it\"))",
+    "elapsed_minutes": 0.0,
+    "result_dir": "C:\\SEM2_project\\DCS\\mpi-odm-paper\\mpi-odm-paper\\shared\\results\\node_0",
+    "num_images": 5
+  },
+  {
+    "rank": 1,
+    "host": "10.100.54.210",
+    "status": "completed",
+    "elapsed_minutes": 2.52,
+    "result_dir": "C:\\SEM2_project\\DCS\\mpi-odm-paper\\mpi-odm-paper\\shared\\results\\node_1",
+    "num_images": 5
+  },
+  {
+    "rank": 2,
+    "host": "10.100.54.32",
+    "status": "completed",
+    "elapsed_minutes": 3.02,
+    "result_dir": "C:\\SEM2_project\\DCS\\mpi-odm-paper\\mpi-odm-paper\\shared\\results\\node_2",
+    "num_images": 5
+  },
+  {
+    "rank": 3,
+    "host": "10.100.53.218",
+    "status": "completed",
+    "elapsed_minutes": 2.02,
+    "result_dir": "C:\\SEM2_project\\DCS\\mpi-odm-paper\\mpi-odm-paper\\shared\\results\\node_3",
+    "num_images": 3
+  }
+]

@@ -1,0 +1,118 @@
+================================================================================
+          MPI-ODM: 2-SYSTEM DISTRIBUTED IMPLEMENTATION PLAN
+================================================================================
+
+This document outlines the exact, step-by-step logic to deploy the MPI 
+Distributed Photogrammetry workflow across two distinct Windows systems.
+
+For clarity:
+- SYSTEM A: Your current "Master" PC.
+- SYSTEM B: The new secondary "Worker" PC.
+
+--------------------------------------------------------------------------------
+STEP 1: FILE TRANSFER & ENVIRONMENT PREPARATION
+--------------------------------------------------------------------------------
+
+1. Exact File to Transfer:
+   Take the zip file located at: 
+   `c:\SEM2_project\DCS\mpi-odm-paper\MPI-ODM_Project_Implementation.zip`
+   Copy this exact file to a USB drive or Cloud Storage, and transfer it over 
+   to SYSTEM B. 
+
+2. Extract on System B:
+   Extract the repository into a usable directory natively on System B 
+   (e.g., `C:\MPI-ODM-Project`).
+
+--------------------------------------------------------------------------------
+STEP 2: INSTALL CORE DEPENDENCIES ON SYSTEM B
+--------------------------------------------------------------------------------
+System B requires the same identical software foundation as System A. 
+Ensure you install the following on SYSTEM B:
+
+1. Python 3.10+
+   - Download the latest Python installer from python.org.
+   - CRITICAL: Check the box "Add Python to PATH" during installation.
+
+2. Microsoft MPI (MS-MPI)
+   - Go to: https://github.com/microsoft/Microsoft-MPI/releases
+   - Download and run BOTH: `msmpisetup.exe` and `msmpisdk.msi`. 
+
+3. Docker Desktop 
+   - Download and install Docker Desktop for Windows.
+   - Ensure it is running in your system tray (requires WSL2 enabled on Windows).
+
+4. Python Dependencies
+   - Open PowerShell inside the extracted directory on System B.
+   - Run: `python -m venv venv`
+   - Run: `.\venv\Scripts\activate`
+   - Run: `pip install -r requirements.txt`
+
+--------------------------------------------------------------------------------
+STEP 3: INITIALIZE BACKEND ENGINES (On Both Systems)
+--------------------------------------------------------------------------------
+Photogrammetry processing relies on Docker listening actively.
+
+1. On System A: Ensure Docker is running.
+2. On System B: Ensure Docker is running.
+3. On BOTH Systems, open PowerShell and execute:
+   `docker run -d -p 3000:3000 opendronemap/nodeodm`
+
+--------------------------------------------------------------------------------
+STEP 4: NETWORK SECURITY & ACCOUNT CREDENTIALS
+--------------------------------------------------------------------------------
+
+1. Gather IP Addresses:
+   - On System A, open PowerShell and type `ipconfig` -> note the IPv4 Address.
+   - On System B, open PowerShell and type `ipconfig` -> note the IPv4 Address.
+   - *Example: System A is `192.168.1.100`, System B is `192.168.1.101`.*
+
+2. Firewall Configuration (On Both Systems):
+   - To prevent Windows from blocking MPI traffic silently, temporarily 
+     turn OFF the "Windows Defender Firewall" for Private Networks during 
+     this execution, OR create an inbound rule allowing TCP Port 3000 and 
+     all `mpiexec` applications. 
+
+3. Synchronize MPI Credentials (On System A):
+   MS-MPI requires remote access permissions to trigger System B.
+   - On SYSTEM A, open PowerShell and register your exact Windows User password:
+     `smpd.exe -d`
+     `mpiexec -register`
+   - Note: For flawless cross-network MS-MPI executions, it is highly recommended 
+     both PCs share the identical local Administrator account Name & Passwords.
+
+--------------------------------------------------------------------------------
+STEP 5: EDIT CONFIGURATIONS (On System A ONLY)
+--------------------------------------------------------------------------------
+You only need to edit the routing logic on your master controller (System A).
+
+1. Edit the `hosts` file on System A:
+   Open `c:\SEM2_project\DCS\mpi-odm-paper\mpi-odm-paper\hosts`
+   Modify it to assign computing slots spanning your two IP addresses:
+     192.168.1.100 slots=2
+     192.168.1.101 slots=2
+
+2. Edit `config\cluster_config.json` on System A:
+   Open it and update the nodes block with the actual IPs of your systems so 
+   the Python architecture knows where the distinct NodeODM docker engines are:
+     "nodes": [
+       { "rank": 0, "name": "SystemA_1", "host": "192.168.1.100" },
+       { "rank": 1, "name": "SystemA_2", "host": "192.168.1.100" },
+       { "rank": 2, "name": "SystemB_1", "host": "192.168.1.101" },
+       { "rank": 3, "name": "SystemB_2", "host": "192.168.1.101" }
+     ]
+
+--------------------------------------------------------------------------------
+STEP 6: EXECUTE THE DISTRIBUTED WORKFLOW!
+--------------------------------------------------------------------------------
+With everything configured, the final step happens from System A!
+
+1. Open PowerShell on System A located in the project directory.
+2. Ensure you are in the virtual environment: `.\venv\Scripts\activate`
+3. Execute the single control string:
+   `powershell -ExecutionPolicy Bypass -File .\run_single_system.ps1`
+
+RESULTS:
+System A's Python environment will compile the datasets, chunk everything, 
+and deploy it natively utilizing MS-MPI across your router straight into 
+System B's Docker container. Ranks 0 and 1 calculate physically on System A 
+while Ranks 2 and 3 calculate physically on System B concurrently!
